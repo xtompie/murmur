@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>murmur</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <span class="logo">murmur</span>
+        <span class="badge">
+          <span class="badge-dot"></span>
+          lokalnie / WebGPU
+        </span>
+      </div>
+      <button class="btn-settings" id="btnSettings" aria-label="Ustawienia">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.2 12.5a1.375 1.375 0 0 0 .275 1.517l.05.05a1.667 1.667 0 1 1-2.358 2.358l-.05-.05a1.375 1.375 0 0 0-1.517-.275 1.375 1.375 0 0 0-.833 1.258v.142a1.667 1.667 0 1 1-3.334 0v-.075A1.375 1.375 0 0 0 7.533 16.2a1.375 1.375 0 0 0-1.516.275l-.05.05a1.667 1.667 0 1 1-2.359-2.358l.05-.05a1.375 1.375 0 0 0 .276-1.517 1.375 1.375 0 0 0-1.259-.833H2.5a1.667 1.667 0 1 1 0-3.334h.075A1.375 1.375 0 0 0 3.8 7.533a1.375 1.375 0 0 0-.275-1.516l-.05-.05A1.667 1.667 0 1 1 5.833 3.608l.05.05a1.375 1.375 0 0 0 1.517.275h.067a1.375 1.375 0 0 0 .833-1.258V2.5a1.667 1.667 0 0 1 3.333 0v.075a1.375 1.375 0 0 0 .834 1.258 1.375 1.375 0 0 0 1.516-.275l.05-.05a1.667 1.667 0 1 1 2.358 2.359l-.05.05a1.375 1.375 0 0 0-.275 1.516v.067a1.375 1.375 0 0 0 1.259.833H17.5a1.667 1.667 0 0 1 0 3.334h-.075a1.375 1.375 0 0 0-1.258.833Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- LLM Download progress -->
+    <div class="download-progress" id="downloadProgress">
+      <div class="download-label">
+        <span id="downloadLabel">Pobieranie modelu LLM...</span>
+        <span id="downloadPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Record section -->
+    <div class="record-section">
+      <button class="btn-record" id="btnRecord" disabled>
+        <span class="btn-record-icon" id="recordIcon">
+          <!-- mic icon -->
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 10a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="11" y1="17" x2="11" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="8" y1="21" x2="14" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="btn-record-label" id="recordLabel">Nagraj</span>
+      </button>
+      <div class="timer" id="timer">00:00:00</div>
+    </div>
+
+    <!-- Waveform -->
+    <div class="waveform-wrap" id="waveformWrap">
+      <canvas id="waveform"></canvas>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-section">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="transcript">Transkrypcja</button>
+        <button class="tab-btn" data-tab="notes">Notatki</button>
+        <button class="tab-btn" data-tab="summary">Skrót</button>
+      </div>
+
+      <!-- Transcript tab -->
+      <div class="tab-content active" id="tab-transcript">
+        <div class="tab-text" id="transcriptText">
+          <span class="placeholder">Transkrypcja pojawi się tutaj podczas nagrywania...</span>
+        </div>
+        <div id="transcribingIndicator" class="transcribing-indicator" style="display:none">
+          <span class="dot"></span> Transkrybuję...
+        </div>
+        <div class="tab-footer">
+          <button class="btn-copy" id="copyTranscript" data-target="transcriptText">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Kopiuj
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes tab -->
+      <div class="tab-content" id="tab-notes">
+        <div class="tab-text" id="notesText">
+          <span class="placeholder">Notatki zostaną wygenerowane po zakończeniu nagrywania.</span>
+        </div>
+        <div class="tab-footer">
+          <button class="btn-copy" id="copyNotes" data-target="notesText">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Kopiuj
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary tab -->
+      <div class="tab-content" id="tab-summary">
+        <div class="tab-text" id="summaryText">
+          <span class="placeholder">Skrót zostanie wygenerowany po zakończeniu nagrywania.</span>
+        </div>
+        <div class="tab-footer">
+          <button class="btn-copy" id="copySummary" data-target="summaryText">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Kopiuj
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.app -->
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="modal">
+      <div class="modal-title">Ustawienia</div>
+      <div class="modal-subtitle">Wybierz model Whisper i język transkrypcji</div>
+
+      <div class="form-group">
+        <label class="form-label" for="selectWhisper">Model Whisper</label>
+        <select class="form-select" id="selectWhisper">
+          <option value="tiny-q5_1">tiny – Q5_1, 31 MB (domyślny)</option>
+          <option value="base-q5_1">base – Q5_1, 57 MB</option>
+          <option value="small-q5_1">small – Q5_1, 182 MB</option>
+          <option value="medium-q5_0">medium – Q5_0, 515 MB</option>
+          <option value="large-q5_0">large – Q5_0, 1030 MB</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="selectLang">Język transkrypcji</label>
+        <select class="form-select" id="selectLang">
+          <option value="auto">Auto (wykryj automatycznie)</option>
+          <option value="pl" selected>Polski</option>
+          <option value="en">Angielski</option>
+          <option value="de">Niemiecki</option>
+          <option value="fr">Francuski</option>
+          <option value="es">Hiszpański</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnSettingsCancel">Anuluj</button>
+        <button class="btn-primary" id="btnSettingsSave">Zapisz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WebGPU Error Modal -->
+  <div class="modal-overlay" id="modalWebGPU">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 7v5M11 15.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9.26 2.908 1.43 16.5A2 2 0 0 0 3.17 19.5h15.66a2 2 0 0 0 1.74-3L12.74 2.908a2 2 0 0 0-3.48 0Z" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+      </div>
+      <div class="modal-title">WebGPU niedostępne</div>
+      <div class="modal-subtitle">
+        Twoja przeglądarka nie wspiera WebGPU, wymaganego do uruchomienia lokalnego modelu językowego.<br><br>
+        Użyj <strong>Chrome 113+</strong> lub <strong>Edge 113+</strong> na komputerze.
+        Na macOS działa również <strong>Safari 18+</strong>.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btnWebGPUClose">Rozumiem</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Microphone Error Modal -->
+  <div class="modal-overlay" id="modalMic">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="8" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M4 10a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="modal-title">Brak dostępu do mikrofonu</div>
+      <div class="modal-subtitle">
+        Zezwól przeglądarce na dostęp do mikrofonu, a następnie odśwież stronę.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btnMicClose">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Error -->
+  <div class="modal-overlay" id="modalDownloadErr">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 7v5M11 15.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="11" cy="11" r="9" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+      </div>
+      <div class="modal-title">Błąd pobierania modelu</div>
+      <div class="modal-subtitle" id="downloadErrMsg">
+        Nie udało się pobrać modelu. Sprawdź połączenie z internetem.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnDownloadErrClose">Zamknij</button>
+        <button class="btn-primary" id="btnDownloadRetry">Spróbuj ponownie</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
