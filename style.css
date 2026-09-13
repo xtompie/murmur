@@ -450,11 +450,14 @@ header {
 /* ── Modals ── */
 
 .modal {
+  /* A native dialog centres itself with margin:auto — which the reset above
+     would otherwise flatten to 0, pinning it to the top-left corner. */
+  margin: auto;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 32px;
-  width: 100%;
+  width: calc(100% - 40px);
   max-width: 400px;
   color: var(--text);
   box-shadow: 0 8px 32px rgba(36, 26, 16, 0.08);
