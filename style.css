@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+/*
+ * Classes style. Attributes carry state.
+ * Every state selector below targets an attribute, never a class.
+ */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -57,7 +60,6 @@ header {
   justify-content: space-between;
   padding: 32px 0 24px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
 }
 
 .header-left {
@@ -94,7 +96,7 @@ header {
   transition: background 0.3s;
 }
 
-.badge-dot.connected {
+[recorder-badge][recorder-connected] {
   background: var(--green);
 }
 
@@ -118,7 +120,7 @@ header {
   display: block;
 }
 
-/* ── Record section ── */
+/* ── Record button ── */
 
 .record-section {
   display: flex;
@@ -149,21 +151,21 @@ header {
   transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.12s;
 }
 
-.btn-record:hover:not(:disabled) {
+.btn-record:hover {
   background: var(--bg-3);
   border-color: var(--accent-2);
 }
 
-.btn-record:active:not(:disabled) {
+.btn-record:active {
   transform: scale(0.97);
 }
 
-.btn-record:disabled {
+[recorder-state="connecting"] .btn-record {
   opacity: 0.45;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
-.btn-record.recording {
+[recorder-state="recording"] .btn-record {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--bg);
@@ -172,7 +174,7 @@ header {
 
 @keyframes pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(61, 44, 30, 0); }
-  50%       { box-shadow: 0 0 0 8px rgba(61, 44, 30, 0.12); }
+  50%      { box-shadow: 0 0 0 8px rgba(61, 44, 30, 0.12); }
 }
 
 .btn-record-icon {
@@ -188,7 +190,12 @@ header {
   letter-spacing: 0.12em;
 }
 
-/* Spinner */
+/* The icon and the label for the current state; the rest stay hidden. */
+[recorder-icon] { display: none; }
+[recorder-state="idle"]       [recorder-icon="idle"],
+[recorder-state="connecting"] [recorder-icon="connecting"],
+[recorder-state="recording"]  [recorder-icon="recording"] { display: block; }
+
 .spinner {
   width: 18px;
   height: 18px;
@@ -196,11 +203,6 @@ header {
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-}
-
-.btn-record.recording .spinner {
-  border-color: rgba(248, 245, 238, 0.3);
-  border-top-color: var(--bg);
 }
 
 @keyframes spin {
@@ -217,7 +219,7 @@ header {
   display: none;
 }
 
-.timer.visible {
+[recorder-state="recording"] .timer {
   display: block;
 }
 
@@ -229,11 +231,11 @@ header {
   margin-bottom: 4px;
 }
 
-.waveform-wrap.visible {
+[recorder-state="recording"] .waveform-wrap {
   display: block;
 }
 
-#waveform {
+[recorder-waveform] {
   width: 100%;
   height: 44px;
   display: block;
@@ -250,7 +252,6 @@ header {
 
 .tabs-header {
   display: flex;
-  gap: 0;
 }
 
 .tab-btn {
@@ -284,33 +285,36 @@ header {
   transition: opacity 0.15s;
 }
 
-.tab-btn:first-child::after {
-  left: 0;
-}
-
-.tab-btn.active {
+.tab-btn[tab-on] {
   color: var(--text);
 }
 
-.tab-btn.active::after {
+.tab-btn[tab-on]::after {
   opacity: 1;
 }
 
 .tab-content {
   display: none;
-  flex: 1;
   padding: 20px 0 0;
   min-height: 200px;
 }
 
-.tab-content.active {
+.tab-content[tab-on] {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.tab-text {
+/* ── Panes: placeholder / skeleton / content ── */
+
+[pane-tag]          { display: none; }
+[pane-tag][pane-on] { display: block; }
+
+.pane {
   flex: 1;
+}
+
+.tab-text {
   line-height: 1.85;
   font-size: 15px;
   color: var(--text);
@@ -327,18 +331,18 @@ header {
 .tab-text::-webkit-scrollbar-track { background: transparent; }
 .tab-text::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 2px; }
 
-.tab-text .placeholder {
+.placeholder {
   color: var(--text-muted);
   font-style: italic;
   font-size: 14px;
   font-family: 'DM Sans', sans-serif;
 }
 
-.tab-text .segment {
+[recorder-segment] {
   animation: fadeIn 0.4s ease;
 }
 
-.tab-text .interim {
+.interim {
   color: var(--text-dim);
 }
 
@@ -346,6 +350,62 @@ header {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ── Transcribing indicator: shown only while an interim fragment exists ── */
+
+.transcribing-indicator {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+.tab-content:has([recorder-interim]:not(:empty)) [recorder-indicator] {
+  display: inline-flex;
+}
+
+.transcribing-indicator .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.2; }
+}
+
+/* ── Skeleton ── */
+
+.skeleton {
+  gap: 10px;
+  padding: 4px 0;
+}
+
+[pane-tag="busy"][pane-on] {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(90deg, var(--bg-3) 25%, var(--bg-2) 50%, var(--bg-3) 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Copy button ── */
 
 .tab-footer {
   display: flex;
@@ -378,79 +438,16 @@ header {
   background: var(--bg-2);
 }
 
-.btn-copy.copied {
+.btn-copy[copy-done] {
   color: var(--green);
   border-color: var(--green);
 }
 
-/* ── Transcribing indicator ── */
-
-.transcribing-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 8px;
-  letter-spacing: 0.03em;
-}
-
-.transcribing-indicator .dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent-2);
-  animation: blink 1.2s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.2; }
-}
-
-/* ── Skeleton ── */
-
-.skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.skeleton-line {
-  height: 14px;
-  background: linear-gradient(90deg, var(--bg-3) 25%, var(--bg-2) 50%, var(--bg-3) 75%);
-  background-size: 200% 100%;
-  border-radius: 4px;
-  animation: shimmer 1.6s infinite;
-}
-
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+.btn-copy-done                { display: none; }
+.btn-copy[copy-done] .btn-copy-idle { display: none; }
+.btn-copy[copy-done] .btn-copy-done { display: inline; }
 
 /* ── Modals ── */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(36, 26, 16, 0.35);
-  backdrop-filter: blur(3px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s;
-}
-
-.modal-overlay.visible {
-  opacity: 1;
-  pointer-events: all;
-}
 
 .modal {
   background: var(--bg);
@@ -459,13 +456,13 @@ header {
   padding: 32px;
   width: 100%;
   max-width: 400px;
-  transform: translateY(6px);
-  transition: transform 0.18s;
+  color: var(--text);
   box-shadow: 0 8px 32px rgba(36, 26, 16, 0.08);
 }
 
-.modal-overlay.visible .modal {
-  transform: translateY(0);
+.modal::backdrop {
+  background: rgba(36, 26, 16, 0.35);
+  backdrop-filter: blur(3px);
 }
 
 .modal-title {
@@ -473,7 +470,6 @@ header {
   font-size: 21px;
   font-weight: 400;
   margin-bottom: 6px;
-  color: var(--text);
 }
 
 .modal-subtitle {
@@ -601,7 +597,7 @@ header {
   z-index: 200;
 }
 
-.toast.show {
+[toast][toast-on] {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }

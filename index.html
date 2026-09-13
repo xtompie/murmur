@@ -12,171 +12,258 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <script src="saradom/Util.js"></script>
+  <script src="saradom/Switch.js"></script>
+  <script src="saradom/SInit.js"></script>
+  <script src="Toast/Toast.js"></script>
+  <script src="Copy/Copy.js"></script>
+  <script src="Settings/Settings.js"></script>
+  <script src="Openai/Openai.js"></script>
+  <script src="Waveform/Waveform.js"></script>
+  <script src="Notes/Notes.js"></script>
+  <script src="Recorder/Recorder.js"></script>
 </head>
 <body>
-  <div class="app">
 
-    <header>
-      <div class="header-left">
-        <span class="logo">murmur</span>
-        <span class="badge">
-          <span class="badge-dot" id="badgeDot"></span>
-          OpenAI
-        </span>
-      </div>
-      <button class="btn-settings" id="btnSettings" aria-label="Ustawienia">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M16.2 12.5a1.375 1.375 0 0 0 .275 1.517l.05.05a1.667 1.667 0 1 1-2.358 2.358l-.05-.05a1.375 1.375 0 0 0-1.517-.275 1.375 1.375 0 0 0-.833 1.258v.142a1.667 1.667 0 1 1-3.334 0v-.075A1.375 1.375 0 0 0 7.533 16.2a1.375 1.375 0 0 0-1.516.275l-.05.05a1.667 1.667 0 1 1-2.359-2.358l.05-.05a1.375 1.375 0 0 0 .276-1.517 1.375 1.375 0 0 0-1.259-.833H2.5a1.667 1.667 0 1 1 0-3.334h.075A1.375 1.375 0 0 0 3.8 7.533a1.375 1.375 0 0 0-.275-1.516l-.05-.05A1.667 1.667 0 1 1 5.833 3.608l.05.05a1.375 1.375 0 0 0 1.517.275h.067a1.375 1.375 0 0 0 .833-1.258V2.5a1.667 1.667 0 0 1 3.333 0v.075a1.375 1.375 0 0 0 .834 1.258 1.375 1.375 0 0 0 1.516-.275l.05-.05a1.667 1.667 0 1 1 2.358 2.359l-.05.05a1.375 1.375 0 0 0-.275 1.516v.067a1.375 1.375 0 0 0 1.259.833H17.5a1.667 1.667 0 0 1 0 3.334h-.075a1.375 1.375 0 0 0-1.258.833Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </header>
+<div class="app"
+     recorder-space recorder-state="idle"
+     settings-space
+     switch-space switch-state="transcript">
 
-    <div class="record-section">
-      <button class="btn-record" id="btnRecord">
-        <span class="btn-record-icon" id="recordIcon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="8" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/>
-            <path d="M4 10a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="11" y1="17" x2="11" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="8" y1="21" x2="14" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="btn-record-label" id="recordLabel">Nagraj</span>
-      </button>
-      <div class="timer" id="timer">00:00:00</div>
+  <header>
+    <div class="header-left">
+      <span class="logo">murmur</span>
+      <span class="badge">
+        <span class="badge-dot" recorder-badge></span>
+        OpenAI
+      </span>
     </div>
+    <button class="btn-settings" onclick="Settings.Open(this)" aria-label="Ustawienia">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16.2 12.5a1.375 1.375 0 0 0 .275 1.517l.05.05a1.667 1.667 0 1 1-2.358 2.358l-.05-.05a1.375 1.375 0 0 0-1.517-.275 1.375 1.375 0 0 0-.833 1.258v.142a1.667 1.667 0 1 1-3.334 0v-.075A1.375 1.375 0 0 0 7.533 16.2a1.375 1.375 0 0 0-1.516.275l-.05.05a1.667 1.667 0 1 1-2.359-2.358l.05-.05a1.375 1.375 0 0 0 .276-1.517 1.375 1.375 0 0 0-1.259-.833H2.5a1.667 1.667 0 1 1 0-3.334h.075A1.375 1.375 0 0 0 3.8 7.533a1.375 1.375 0 0 0-.275-1.516l-.05-.05A1.667 1.667 0 1 1 5.833 3.608l.05.05a1.375 1.375 0 0 0 1.517.275h.067a1.375 1.375 0 0 0 .833-1.258V2.5a1.667 1.667 0 0 1 3.333 0v.075a1.375 1.375 0 0 0 .834 1.258 1.375 1.375 0 0 0 1.516-.275l.05-.05a1.667 1.667 0 1 1 2.358 2.359l-.05.05a1.375 1.375 0 0 0-.275 1.516v.067a1.375 1.375 0 0 0 1.259.833H17.5a1.667 1.667 0 0 1 0 3.334h-.075a1.375 1.375 0 0 0-1.258.833Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </header>
 
-    <div class="waveform-wrap" id="waveformWrap">
-      <canvas id="waveform"></canvas>
-    </div>
-
-    <div class="tabs-section">
-      <div class="tabs-header">
-        <button class="tab-btn active" data-tab="transcript">Transkrypcja</button>
-        <button class="tab-btn" data-tab="notes">Notatki</button>
-        <button class="tab-btn" data-tab="summary">Skrót</button>
-      </div>
-
-      <div class="tab-content active" id="tab-transcript">
-        <div class="tab-text" id="transcriptText">
-          <span class="placeholder">Transkrypcja pojawi się tutaj podczas nagrywania...</span>
-        </div>
-        <div id="transcribingIndicator" class="transcribing-indicator" style="display:none">
-          <span class="dot"></span> Transkrybuję...
-        </div>
-        <div class="tab-footer">
-          <button class="btn-copy" data-target="transcriptText">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-            Kopiuj
-          </button>
-        </div>
-      </div>
-
-      <div class="tab-content" id="tab-notes">
-        <div class="tab-text" id="notesText">
-          <span class="placeholder">Notatki zostaną wygenerowane po zakończeniu nagrywania.</span>
-        </div>
-        <div class="tab-footer">
-          <button class="btn-copy" data-target="notesText">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-            Kopiuj
-          </button>
-        </div>
-      </div>
-
-      <div class="tab-content" id="tab-summary">
-        <div class="tab-text" id="summaryText">
-          <span class="placeholder">Skrót zostanie wygenerowany po zakończeniu nagrywania.</span>
-        </div>
-        <div class="tab-footer">
-          <button class="btn-copy" data-target="summaryText">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-              <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-            Kopiuj
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /.app -->
-
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="modalSettings">
-    <div class="modal">
-      <div class="modal-title">Ustawienia</div>
-      <div class="modal-subtitle">Klucz API i język transkrypcji</div>
-
-      <div class="form-group">
-        <label class="form-label" for="inputApiKey">Klucz OpenAI API</label>
-        <input type="password" class="form-input" id="inputApiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="selectLang">Język</label>
-        <select class="form-select" id="selectLang">
-          <option value="auto">Auto (wykryj automatycznie)</option>
-          <option value="pl" selected>Polski</option>
-          <option value="en">Angielski</option>
-          <option value="de">Niemiecki</option>
-          <option value="fr">Francuski</option>
-          <option value="es">Hiszpański</option>
-        </select>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btnSettingsCancel">Anuluj</button>
-        <button class="btn-primary" id="btnSettingsSave">Zapisz</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Microphone Error Modal -->
-  <div class="modal-overlay" id="modalMic">
-    <div class="modal">
-      <div class="modal-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+  <div class="record-section">
+    <button class="btn-record" onclick="Recorder.Toggle(this)">
+      <span class="btn-record-icon">
+        <svg recorder-icon="idle" width="22" height="22" viewBox="0 0 22 22" fill="none">
           <rect x="8" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/>
           <path d="M4 10a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          <line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="11" y1="17" x2="11" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="8" y1="21" x2="14" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-      </div>
-      <div class="modal-title">Brak dostępu do mikrofonu</div>
-      <div class="modal-subtitle">Zezwól przeglądarce na dostęp do mikrofonu, a następnie odśwież stronę.</div>
-      <div class="modal-actions">
-        <button class="btn-primary" id="btnMicClose">OK</button>
-      </div>
-    </div>
+        <svg recorder-icon="recording" width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="3" y="3" width="12" height="12" rx="2" fill="currentColor"/>
+        </svg>
+        <span recorder-icon="connecting" class="spinner"></span>
+      </span>
+      <span class="btn-record-label">
+        <span recorder-icon="idle">Nagraj</span>
+        <span recorder-icon="recording">Stop</span>
+        <span recorder-icon="connecting">Czekaj</span>
+      </span>
+    </button>
+    <div class="timer" recorder-timer>00:00:00</div>
   </div>
 
-  <!-- API Error Modal -->
-  <div class="modal-overlay" id="modalApiError">
-    <div class="modal">
-      <div class="modal-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <path d="M11 7v5M11 15.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M9.26 2.908 1.43 16.5A2 2 0 0 0 3.17 19.5h15.66a2 2 0 0 0 1.74-3L12.74 2.908a2 2 0 0 0-3.48 0Z" stroke="currentColor" stroke-width="1.6"/>
-        </svg>
-      </div>
-      <div class="modal-title">Błąd połączenia</div>
-      <div class="modal-subtitle" id="apiErrorMsg">Wystąpił błąd podczas łączenia z OpenAI.</div>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btnApiErrClose">Zamknij</button>
-        <button class="btn-primary" id="btnApiErrSettings">Ustawienia</button>
-      </div>
-    </div>
+  <div class="waveform-wrap">
+    <canvas recorder-waveform></canvas>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="tabs-section">
+    <div class="tabs-header">
+      <button class="tab-btn"
+              switch-tag="transcript" switch-onchange="(on)=>this.flag('tab-on', on)" tab-on
+              onclick="Switch.To(this, '[switch-space]', 'transcript')">Transkrypcja</button>
+      <button class="tab-btn"
+              switch-tag="notes" switch-onchange="(on)=>this.flag('tab-on', on)"
+              onclick="Switch.To(this, '[switch-space]', 'notes')">Notatki</button>
+      <button class="tab-btn"
+              switch-tag="summary" switch-onchange="(on)=>this.flag('tab-on', on)"
+              onclick="Switch.To(this, '[switch-space]', 'summary')">Skrót</button>
+    </div>
 
-  <script src="app.js" type="module"></script>
+    <!-- Transcript -->
+    <section class="tab-content" copy-space
+             switch-tag="transcript" switch-onchange="(on)=>this.flag('tab-on', on)" tab-on>
+
+      <div class="pane" recorder-pane
+           pane-space switch-config-tag="pane-tag" switch-state="empty">
+
+        <p class="placeholder"
+           pane-tag="empty" switch-onchange="(on)=>this.flag('pane-on', on)" pane-on>
+          Transkrypcja pojawi się tutaj podczas nagrywania...
+        </p>
+
+        <div class="tab-text" recorder-scroll
+             pane-tag="ready" switch-onchange="(on)=>this.flag('pane-on', on)">
+          <span copy-value recorder-value></span><span class="interim" recorder-interim></span>
+        </div>
+      </div>
+
+      <div class="transcribing-indicator" recorder-indicator>
+        <span class="dot"></span> Transkrybuję...
+      </div>
+
+      <footer class="tab-footer">
+        <button class="btn-copy" onclick="Copy.Copy(this)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-copy-idle">Kopiuj</span>
+          <span class="btn-copy-done">Skopiowano!</span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- Notes -->
+    <section class="tab-content" copy-space
+             switch-tag="notes" switch-onchange="(on)=>this.flag('tab-on', on)">
+
+      <div class="pane" notes-pane
+           pane-space switch-config-tag="pane-tag" switch-state="empty">
+
+        <p class="placeholder"
+           pane-tag="empty" switch-onchange="(on)=>this.flag('pane-on', on)" pane-on>
+          Notatki zostaną wygenerowane po zakończeniu nagrywania.
+        </p>
+
+        <div class="skeleton"
+             pane-tag="busy" switch-onchange="(on)=>this.flag('pane-on', on)">
+          <div class="skeleton-line" style="width:88%"></div>
+          <div class="skeleton-line" style="width:72%"></div>
+          <div class="skeleton-line" style="width:90%"></div>
+          <div class="skeleton-line" style="width:65%"></div>
+          <div class="skeleton-line" style="width:80%"></div>
+          <div class="skeleton-line" style="width:55%"></div>
+        </div>
+
+        <div class="tab-text"
+             pane-tag="ready" switch-onchange="(on)=>this.flag('pane-on', on)">
+          <span copy-value notes-value></span>
+        </div>
+      </div>
+
+      <footer class="tab-footer">
+        <button class="btn-copy" onclick="Copy.Copy(this)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-copy-idle">Kopiuj</span>
+          <span class="btn-copy-done">Skopiowano!</span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- Summary -->
+    <section class="tab-content" copy-space
+             switch-tag="summary" switch-onchange="(on)=>this.flag('tab-on', on)">
+
+      <div class="pane" summary-pane
+           pane-space switch-config-tag="pane-tag" switch-state="empty">
+
+        <p class="placeholder"
+           pane-tag="empty" switch-onchange="(on)=>this.flag('pane-on', on)" pane-on>
+          Skrót zostanie wygenerowany po zakończeniu nagrywania.
+        </p>
+
+        <div class="skeleton"
+             pane-tag="busy" switch-onchange="(on)=>this.flag('pane-on', on)">
+          <div class="skeleton-line" style="width:90%"></div>
+          <div class="skeleton-line" style="width:76%"></div>
+          <div class="skeleton-line" style="width:58%"></div>
+        </div>
+
+        <div class="tab-text"
+             pane-tag="ready" switch-onchange="(on)=>this.flag('pane-on', on)">
+          <span copy-value summary-value></span>
+        </div>
+      </div>
+
+      <footer class="tab-footer">
+        <button class="btn-copy" onclick="Copy.Copy(this)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="4.5" y="4.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2.5 8.5H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5a1 1 0 0 1 1 1v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span class="btn-copy-idle">Kopiuj</span>
+          <span class="btn-copy-done">Skopiowano!</span>
+        </button>
+      </footer>
+    </section>
+  </div>
+
+  <!-- Settings -->
+  <dialog class="modal" settings-dialog oncancel="Settings.Guard(event, this)">
+    <div class="modal-title">Ustawienia</div>
+    <div class="modal-subtitle">Klucz API i język transkrypcji</div>
+
+    <div class="form-group">
+      <label class="form-label" for="settingsKey">Klucz OpenAI API</label>
+      <input type="password" class="form-input" id="settingsKey" settings-key
+             placeholder="sk-..." autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="settingsLang">Język</label>
+      <select class="form-select" id="settingsLang" settings-lang>
+        <option value="auto">Auto (wykryj automatycznie)</option>
+        <option value="pl" selected>Polski</option>
+        <option value="en">Angielski</option>
+        <option value="de">Niemiecki</option>
+        <option value="fr">Francuski</option>
+        <option value="es">Hiszpański</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="Settings.Cancel(this)">Anuluj</button>
+      <button class="btn-primary" onclick="Settings.Save(this)">Zapisz</button>
+    </div>
+  </dialog>
+
+  <!-- Microphone error -->
+  <dialog class="modal" recorder-mic-error>
+    <div class="modal-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="8" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M4 10a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="modal-title">Brak dostępu do mikrofonu</div>
+    <div class="modal-subtitle">Zezwól przeglądarce na dostęp do mikrofonu, a następnie odśwież stronę.</div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="this.up('dialog').close()">OK</button>
+    </div>
+  </dialog>
+
+  <!-- API error -->
+  <dialog class="modal" recorder-api-error>
+    <div class="modal-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 7v5M11 15.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9.26 2.908 1.43 16.5A2 2 0 0 0 3.17 19.5h15.66a2 2 0 0 0 1.74-3L12.74 2.908a2 2 0 0 0-3.48 0Z" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <div class="modal-title">Błąd połączenia</div>
+    <div class="modal-subtitle" recorder-api-error-message></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="this.up('dialog').close()">Zamknij</button>
+      <button class="btn-primary" onclick="this.up('dialog').close(); Settings.Open(this)">Ustawienia</button>
+    </div>
+  </dialog>
+
+  <s-init run="(el)=>Settings.Init(el)"></s-init>
+</div>
+
+<div class="toast" toast></div>
+
 </body>
 </html>
